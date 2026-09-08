@@ -30,6 +30,7 @@ npm run preview   # 预览 dist/
 - **静态资源必须用 ESM import 引入**（如 `import url from "../assets/textures/xxx.png"`），让 Vite 处理路径与 `base: "./"` 前缀，否则 GitHub Pages 子路径部署时资源 404。`vite.config.ts` 的 `base: "./"` 是为 Pages 部署设置的，勿改。
 - **不引入任何外部字体/CDN 资源**：像素字体「俐方體11號 / Cubic 11」（OFL 1.1，许可文件在 `assets/fonts/OFL-Cubic-11.txt`）与 MC GUI 材质（`assets/mc/`）均自托管——为了大陆可达性与消除渲染阻塞。新增字体同样走自托管。MC 材质来自游戏客户端解包，版权归 Mojang/Microsoft，页脚保留非官方声明。
 - **触控目标最小 44px 高**（插座、同步按钮等），移动端样式勿低于此值。
+- **背景图可直接替换**：用同名文件覆盖 `assets/backgrounds/night.png`（夜）/ `day.png`（昼）即可，无需改代码。建议 16:9 横图、≥1920×1080、≤500KB（照片用 JPG，像素图用 PNG）；无缝平铺图用正方形（512/1024，四边可循环）。文字可读性由 `body::after` 黑色蒙版保证（夜 55% / 昼 38%），换任何亮度的图都安全；替换为照片时如出现颗粒感，删掉 `.backdrop` 的 `image-rendering: pixelated`。默认背景是 MC 泥土贴图的 512×512 预平铺版。
 - **图标回退规则**：查询错误用 `Barrier.png`，服务器无图标用 `Grass_Block.png`。
 - **主题防 FOUC**：`index.html` `<head>` 中的内联脚本与 `theme.ts` 逻辑需保持同步（读取同一 localStorage key、设置同一 `data-theme` 属性）。
 - 服务器列表数据维护在 `public/servers.json`（推荐 `address` 字符串简写），格式约定见 `public/servers.schema.json`（`.vscode/settings.json` 已关联，供编辑器校验）。

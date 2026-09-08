@@ -102,34 +102,38 @@ body {
   background: #a3a3a3;
 }
 
-/* ====== 泥土背景（MC 客户端 1.21.8 解包材质）====== */
-/* 结构与参考站一致：贴图保持自然亮度，由 body::after 的黑色蒙版压暗保证白字可读 */
-.dirt-bg {
+/* ====== 背景层（可直接替换的图片）======
+   换背景：用同名文件覆盖 assets/backgrounds/night.png / day.png 即可。
+   建议 16:9 横图（≥1920×1080，JPG/PNG，≤500KB）；无缝平铺图可用正方形（512/1024）。
+   可读性由 body::after 的黑色蒙版保证，任意亮度的图都能压住白字。
+   若替换为照片且出现颗粒感，删除下一行的 image-rendering 即可。 */
+.backdrop {
   position: fixed;
   inset: 0;
   z-index: -2;
-  background-repeat: repeat;
-  background-size: 64px 64px;
-  background-image: url("../assets/mc/dirt.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-image: url("../assets/backgrounds/day.png");
   image-rendering: pixelated;
 }
 
-/* 夜晚：贴图略压暗（蒙版之外再收一点） */
-[data-theme="dark"] .dirt-bg {
+/* 夜晚：换用 night.png，略压暗（蒙版之外再收一点） */
+[data-theme="dark"] .backdrop {
+  background-image: url("../assets/backgrounds/night.png");
   filter: brightness(0.8) saturate(0.92);
 }
 
-/* 白天：贴图原亮度，全靠蒙版控制 */
-
-/* 黑色蒙版 + 暗角：位于背景与前景之间，保证白字可读 */
+/* 黑色蒙版 + 暗角：位于背景与前景之间，保证白字可读。
+   注意：纯颜色不能直接作为多层 background 的首层，需包一层 linear-gradient。 */
 body::after {
   content: "";
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background:
-    var(--scrim),
+  background-image:
+    linear-gradient(var(--scrim), var(--scrim)),
     var(--screen-vignette);
 }
 
@@ -194,11 +198,15 @@ body::after {
 
 /* ============================================================
    服务器列表（游戏内条目）
+   常驻黑色蒙版带：参考站同款，随内容占约屏幕 10%–80% 的高度
    ============================================================ */
 .server-list {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  background: rgba(0, 0, 0, 0.45);
+  padding: 10px;
+  min-height: 55vh;
 }
 
 .mc-entry {
