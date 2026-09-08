@@ -13,11 +13,10 @@
 }
 
 /* ====== 主题变量 ====== */
+/* 共享 UI 配色放在 :root，两个主题统一白字黑影；主题块只改蒙版深浅 */
 :root {
   --font-pixel: "Cubic 11", "Ark Latin", "Doto", ui-monospace, monospace;
-}
 
-[data-theme="dark"] {
   --text: #ffffff;
   --text-shadow: 2px 2px rgba(0, 0, 0, 0.72);
   --motd: #aaaaaa;
@@ -36,13 +35,18 @@
   --tip-border: rgba(80, 0, 255, 0.45);
   --tip-text: #ffffff;
 
-  --dirt-filter: brightness(0.45) saturate(0.92);
+  /* 内容蒙版带（罩住整屏文字内容） */
+  --band: rgba(0, 0, 0, 0.45);
+
   --scrim: rgba(0, 0, 0, 0.55);
   --screen-vignette: radial-gradient(120% 100% at 50% 40%, transparent 60%, rgba(0, 0, 0, 0.38) 100%);
+}
+
+[data-theme="dark"] {
   color-scheme: dark;
 }
 
-/* 白天：与夜晚同一套 UI 配色（白字黑影），贴图原亮度 + 更浅的蒙版 */
+/* 白天：同一套白字配色，仅贴图不压暗 + 更浅的全屏蒙版 */
 [data-theme="light"] {
   --scrim: rgba(0, 0, 0, 0.38);
   --screen-vignette: radial-gradient(120% 100% at 50% 40%, transparent 60%, rgba(20, 12, 0, 0.18) 100%);
@@ -140,7 +144,8 @@ body::after {
 }
 
 /* ============================================================
-   屏幕骨架：锁一屏高，头部/底部固定，中部列表在蒙版内滚动
+   屏幕骨架：锁一屏高，头部/底部固定，中部列表滚动；
+   蒙版带罩住整屏文字内容（标题/状态条/列表/按钮/页脚）
    ============================================================ */
 .screen {
   width: min(900px, 94%);
@@ -148,7 +153,8 @@ body::after {
   height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 2.4rem 0 1.2rem;
+  padding: 2rem 1.1rem 1rem;
+  background: var(--band);
 }
 
 .screen-head {
@@ -204,7 +210,7 @@ body::after {
 
 /* ============================================================
    服务器列表（游戏内条目）
-   常驻黑色蒙版带：滚动被限制在蒙版内（模拟游戏内列表）
+   滚动被限制在蒙版带内（模拟游戏内列表），蒙版由 .screen 提供
    ============================================================ */
 .server-list {
   flex: 1 1 auto;
@@ -214,8 +220,7 @@ body::after {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  background: rgba(0, 0, 0, 0.45);
-  padding: 10px;
+  padding: 0 2px;
 }
 
 .mc-entry {
