@@ -1,7 +1,7 @@
 import { getServerId, loadServerList, toAddressList } from "./config";
 import { fetchServerView } from "./api";
 import type { ServerTarget, ServerViewModel } from "./types";
-import { renderLoadingCard, upsertServerCard } from "./ui";
+import { renderLoadingEntry, upsertServerEntry } from "./ui";
 import { initThemeToggle } from "./theme";
 
 // 初始化主题切换（按钮绑定 + 文案同步 + 系统偏好跟随）
@@ -73,7 +73,7 @@ function renderInitialLoading(list: ServerTarget[]): void {
   for (const server of list) {
     const id = getServerId(server);
     const { tag, index } = unitTagOf(id);
-    renderLoadingCard(board, id, tag, index, server.name, toAddressList(server), server.note);
+    renderLoadingEntry(board, id, tag, index, server.name, toAddressList(server), server.note);
   }
 }
 
@@ -135,7 +135,7 @@ function renderSortedViews(views: ServerViewModel[]): void {
   const validIds = new Set(sorted.map((v) => v.id));
 
   for (const view of sorted) {
-    upsertServerCard(board, view, unitTagOf(view.id).tag);
+    upsertServerEntry(board, view, unitTagOf(view.id).tag);
   }
 
   // 调整 DOM 顺序与排序结果一致
@@ -147,7 +147,7 @@ function renderSortedViews(views: ServerViewModel[]): void {
   }
 
   // 移除已不存在的服务器
-  for (const child of Array.from(board.querySelectorAll<HTMLElement>(".card"))) {
+  for (const child of Array.from(board.querySelectorAll<HTMLElement>(".mc-entry"))) {
     if (child.dataset.serverId && !validIds.has(child.dataset.serverId)) {
       child.remove();
     }
@@ -221,12 +221,12 @@ board.addEventListener("click", (event) => {
     return;
   }
 
-  const button = target.closest<HTMLButtonElement>(".card-refresh");
+  const button = target.closest<HTMLButtonElement>(".mc-btn-mini");
   if (!button) {
     return;
   }
 
-  const card = button.closest<HTMLElement>(".card");
+  const card = button.closest<HTMLElement>(".mc-entry");
   const serverId = card?.dataset.serverId;
   if (!serverId) {
     return;
@@ -237,7 +237,7 @@ board.addEventListener("click", (event) => {
   button.innerHTML = '<span class="spin">↻</span>';
 
   void refreshOne(serverId).finally(() => {
-    // upsert 会整体重建卡片内容，这里仅兜底恢复
+    // upsert 会整体重建条目内容，这里仅兜底恢复
     button.disabled = false;
     button.innerHTML = original;
   });

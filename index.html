@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DUT Craft · 服务器状态</title>
+    <title>DUT Craft · 选择服务器</title>
     <link rel="stylesheet" href="/src/styles.css" />
     <!-- 防 FOUC：在样式应用前根据存储/系统偏好锁定主题（与 theme.ts 共用 key "dutcraft-theme"） -->
     <script>
@@ -20,43 +20,43 @@
     </script>
   </head>
   <body>
-    <!-- 极淡噪点，给两面主题都加一层纸感 -->
-    <div class="grain" aria-hidden="true"></div>
+    <!-- 方块纹理背景层（泥土，CSS 生成） -->
+    <div class="dirt-bg" aria-hidden="true"></div>
 
-    <main class="page">
+    <main class="screen">
       <!-- 配置提示：servers.json 加载失败或含无效条目时由 main.ts 填充 -->
-      <div id="config-banner" class="notice" hidden></div>
+      <div id="config-banner" class="mc-notice" hidden></div>
 
-      <header class="masthead">
-        <div class="masthead-main">
-          <p class="overline">服务器状态 · LIVE STATUS</p>
-          <h1>DUT <em>Craft</em></h1>
+      <header class="screen-head">
+        <div class="screen-head-main">
+          <p class="screen-over">DUT CRAFT · MULTIPLAYER</p>
+          <h1 class="screen-title">选择服务器</h1>
         </div>
-        <div class="masthead-side">
-          <span id="clock-time" class="clock" role="timer" aria-label="当前时间">--:--:--</span>
-          <button id="theme-toggle" class="theme-toggle" type="button" aria-label="切换深浅主题" title="切换深浅主题">
-            <span class="theme-glyph" aria-hidden="true">◐</span>
-            <span id="shift-name" class="theme-name">深色</span>
-          </button>
+        <!-- MC 物品提示框样式的状态条 -->
+        <div class="mc-tip" role="timer">
+          <span id="clock-time">--:--:--</span>
+          <span class="tip-sep">·</span>
+          <span><b id="stat-online">--</b>/<b id="stat-units">--</b> 在线</span>
+          <span class="tip-sep">·</span>
+          <span><b id="stat-players">--</b> 位玩家</span>
         </div>
       </header>
 
-      <section class="summary">
-        <div class="summary-stats">
-          <span class="sum"><b id="stat-units">--</b><i>服务器</i></span>
-          <span class="sum"><b id="stat-online">--</b><i>在线</i></span>
-          <span class="sum"><b id="stat-players">--</b><i>玩家</i></span>
-        </div>
-        <div class="summary-actions">
-          <span id="last-sync" class="last-sync">上次同步 --:--:--</span>
-          <button id="refresh-all" class="sync" type="button" aria-label="刷新所有服务器状态">↻ 同步</button>
-        </div>
-      </section>
+      <section class="server-list" id="status-board" aria-live="polite"></section>
 
-      <section class="board" id="status-board" aria-live="polite"></section>
+      <footer class="screen-actions">
+        <span id="last-sync" class="last-sync">上次同步 --:--:--</span>
+        <div class="action-btns">
+          <button id="theme-toggle" class="mc-btn" type="button" aria-label="切换明暗主题" title="切换明暗主题">
+            ◐ <span id="shift-name">夜晚</span>
+          </button>
+          <button id="refresh-all" class="mc-btn mc-btn-primary" type="button" aria-label="刷新所有服务器状态">刷新</button>
+        </div>
+      </footer>
 
       <footer class="page-foot">
         <span>数据来自 api.mcsrvstat.us · 约有数分钟缓存</span>
+        <span>GUI 材质取自 Minecraft 客户端，版权归 Mojang / Microsoft 所有 · 非官方 Minecraft 站点</span>
       </footer>
     </main>
 

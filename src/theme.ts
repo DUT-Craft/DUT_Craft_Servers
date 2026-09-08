@@ -7,8 +7,8 @@ export type Theme = "dark" | "light";
 const STORAGE_KEY = "dutcraft-theme";
 
 const THEME_NAME: Record<Theme, string> = {
-  dark: "深色",
-  light: "浅色"
+  dark: "夜晚",
+  light: "白天"
 };
 
 function resolveStored(): Theme | undefined {
