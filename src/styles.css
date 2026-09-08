@@ -60,7 +60,9 @@ body {
 }
 
 body {
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden; /* 模拟游戏界面：整页不滚动，列表在蒙版带内滚动 */
   font-family: var(--font-pixel);
   font-size: 16px;
   color: var(--text);
@@ -138,12 +140,15 @@ body::after {
 }
 
 /* ============================================================
-   屏幕骨架
+   屏幕骨架：锁一屏高，头部/底部固定，中部列表在蒙版内滚动
    ============================================================ */
 .screen {
   width: min(900px, 94%);
   margin: 0 auto;
-  padding: 3.2rem 0 3.5rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 2.4rem 0 1.2rem;
 }
 
 .screen-head {
@@ -152,7 +157,8 @@ body::after {
   justify-content: space-between;
   gap: 1.2rem;
   flex-wrap: wrap;
-  margin-bottom: 1.6rem;
+  margin-bottom: 1rem;
+  flex: 0 0 auto;
 }
 
 .screen-over {
@@ -198,15 +204,18 @@ body::after {
 
 /* ============================================================
    服务器列表（游戏内条目）
-   常驻黑色蒙版带：参考站同款，随内容占约屏幕 10%–80% 的高度
+   常驻黑色蒙版带：滚动被限制在蒙版内（模拟游戏内列表）
    ============================================================ */
 .server-list {
+  flex: 1 1 auto;
+  min-height: 0; /* flex 子项允许收缩出滚动区 */
+  overflow-y: auto;
+  overscroll-behavior: contain;
   display: flex;
   flex-direction: column;
   gap: 6px;
   background: rgba(0, 0, 0, 0.45);
   padding: 10px;
-  min-height: 55vh;
 }
 
 .mc-entry {
@@ -425,7 +434,8 @@ body::after {
    底部操作区（游戏内底部按钮栏）
    ============================================================ */
 .screen-actions {
-  margin-top: 1.6rem;
+  margin-top: 1rem;
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -512,7 +522,8 @@ body::after {
    页脚
    ============================================================ */
 .page-foot {
-  margin-top: 2.4rem;
+  margin-top: 0.9rem;
+  flex: 0 0 auto;
   text-align: center;
   font-size: 13px;
   color: var(--note);
@@ -523,7 +534,7 @@ body::after {
    ============================================================ */
 @media (max-width: 700px) {
   .screen {
-    padding-top: 2.2rem;
+    padding: 1.4rem 0 0.8rem;
   }
 
   .screen-head {
