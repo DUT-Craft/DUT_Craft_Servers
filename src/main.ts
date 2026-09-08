@@ -166,24 +166,6 @@ function updateStats(): void {
   statPlayers.textContent = String(playersTotal);
 }
 
-async function refreshOne(serverId: string): Promise<void> {
-  const targetServer = activeServerList.find((item) => getServerId(item) === serverId);
-  if (!targetServer) {
-    return;
-  }
-
-  const single = await fetchServerView(targetServer);
-  const existingIndex = latestViews.findIndex((item) => item.id === single.id);
-  if (existingIndex >= 0) {
-    latestViews[existingIndex] = single;
-  } else {
-    latestViews.push(single);
-  }
-
-  renderSortedViews(latestViews);
-  updateStats();
-}
-
 async function refreshAll(): Promise<void> {
   if (syncing) {
     return;
@@ -213,34 +195,6 @@ async function refreshAll(): Promise<void> {
 
 refreshButton.addEventListener("click", () => {
   void refreshAll();
-});
-
-board.addEventListener("click", (event) => {
-  const target = event.target;
-  if (!(target instanceof HTMLElement)) {
-    return;
-  }
-
-  const button = target.closest<HTMLButtonElement>(".mc-btn-mini");
-  if (!button) {
-    return;
-  }
-
-  const card = button.closest<HTMLElement>(".mc-entry");
-  const serverId = card?.dataset.serverId;
-  if (!serverId) {
-    return;
-  }
-
-  const original = button.innerHTML;
-  button.disabled = true;
-  button.innerHTML = '<span class="spin">↻</span>';
-
-  void refreshOne(serverId).finally(() => {
-    // upsert 会整体重建条目内容，这里仅兜底恢复
-    button.disabled = false;
-    button.innerHTML = original;
-  });
 });
 
 // 值班时钟

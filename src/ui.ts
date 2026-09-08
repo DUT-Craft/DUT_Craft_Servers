@@ -128,7 +128,6 @@ export function renderLoadingEntry(
       <div class="mc-motd" title="${escapeHtml(addresses.join("\n"))}"></div>
       <div class="mc-entry-foot">
         ${addrMarkup({ addresses })}
-        <button class="mc-btn mc-btn-mini" type="button" aria-label="刷新服务器 ${escapeHtml(name)}">刷新</button>
       </div>
     </div>
     <div class="mc-entry-side">
@@ -156,7 +155,6 @@ export function upsertServerEntry(parent: HTMLElement, view: ServerViewModel, _t
       ${crewMarkup(view)}
       <div class="mc-entry-foot">
         ${addrMarkup(view)}
-        <button class="mc-btn mc-btn-mini" type="button" aria-label="刷新服务器 ${escapeHtml(view.name)}">刷新</button>
       </div>
     </div>
     <div class="mc-entry-side">
