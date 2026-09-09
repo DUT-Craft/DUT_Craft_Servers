@@ -1,7 +1,7 @@
 import { getServerId, loadServerList, toAddressList } from "./config";
 import { fetchServerView } from "./api";
 import type { ServerTarget, ServerViewModel } from "./types";
-import { renderLoadingEntry, upsertServerEntry } from "./ui";
+import { renderLoadingEntry, upsertServerEntry, copyAddress } from "./ui";
 import { initThemeToggle } from "./theme";
 
 // 初始化主题切换（按钮绑定 + 文案同步 + 系统偏好跟随）
@@ -195,6 +195,74 @@ async function refreshAll(): Promise<void> {
 
 refreshButton.addEventListener("click", () => {
   void refreshAll();
+});
+
+/* ============================================================
+ * 条目交互（游戏内手感）：
+ * 单击条目 → 展开详情；双击条目 → 复制地址。
+ * 用 240ms 定时器区分单击与双击，避免双击时先触发展开。
+ * 地址 chip 与图标按钮自带复制行为，不参与展开。
+ * ============================================================ */
+const CLICK_DELAY_MS = 240;
+let pendingExpand: { entry: HTMLElement; timer: number } | null = null;
+
+function toggleExpand(entry: HTMLElement): void {
+  const expanded = entry.classList.toggle("expanded");
+  entry.setAttribute("aria-expanded", String(expanded));
+}
+
+board.addEventListener("click", (event) => {
+  const target = event.target;
+  if (!(target instanceof HTMLElement)) {
+    return;
+  }
+
+  const entry = target.closest<HTMLElement>(".mc-entry");
+  if (!entry) {
+    return;
+  }
+
+  if (target.closest(".mc-addr") || target.closest(".mc-icon-button")) {
+    return; // 复制按钮自行处理
+  }
+
+  if (window.getSelection()?.toString()) {
+    return; // 正在选取文字时不切换
+  }
+
+  if (pendingExpand) {
+    window.clearTimeout(pendingExpand.timer);
+    pendingExpand = null;
+  }
+
+  const timer = window.setTimeout(() => {
+    pendingExpand = null;
+    toggleExpand(entry);
+  }, CLICK_DELAY_MS);
+  pendingExpand = { entry, timer };
+});
+
+board.addEventListener("dblclick", (event) => {
+  const target = event.target;
+  if (!(target instanceof HTMLElement)) {
+    return;
+  }
+
+  const entry = target.closest<HTMLElement>(".mc-entry");
+  if (!entry) {
+    return;
+  }
+
+  if (target.closest(".mc-addr") || target.closest(".mc-icon-button")) {
+    return;
+  }
+
+  if (pendingExpand) {
+    window.clearTimeout(pendingExpand.timer);
+    pendingExpand = null;
+  }
+
+  void copyAddress(entry.dataset.primaryAddress ?? "");
 });
 
 // 值班时钟

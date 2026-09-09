@@ -230,9 +230,15 @@ body::after {
   gap: 14px;
   padding: 10px 12px;
   border: 2px solid transparent;
+  cursor: pointer;
   transition: background 120ms linear, border-color 120ms linear;
   animation: entry-in 300ms steps(4) both;
   animation-delay: calc(var(--i, 0) * 35ms);
+}
+
+.mc-entry.expanded {
+  background: var(--row-hover-bg);
+  border-color: rgba(255, 255, 255, 0.85);
 }
 
 @keyframes entry-in {
@@ -260,7 +266,47 @@ body::after {
   border: 1px solid #000000;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
   background: #1c1917;
+}
+
+/* 图标按钮：悬停出现"加入箭头"（游戏内同款），单击复制地址 */
+.mc-icon-button {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
   align-self: center;
+}
+
+.mc-icon-button .mc-icon {
+  display: block;
+}
+
+.mc-icon-join {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.62);
+}
+
+.mc-icon-button:hover .mc-icon-join,
+.mc-icon-button:focus-visible .mc-icon-join {
+  display: flex;
+}
+
+/* CSS 三角箭头（像素风清晰，不依赖字体的 ▶） */
+.mc-icon-join::before {
+  content: "";
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: 15px solid #dcdcdc;
+  margin-left: 4px;
 }
 
 /* 主信息列 */
@@ -382,6 +428,62 @@ body::after {
   50% {
     opacity: 0.35;
   }
+}
+
+/* ====== 详情展开区（物品提示框样式，单击条目展开）====== */
+.mc-detail-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 180ms ease;
+}
+
+.mc-entry.expanded .mc-detail-wrap {
+  grid-template-rows: 1fr;
+}
+
+.mc-detail {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.mc-detail-box {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: var(--tip-bg);
+  border: 2px solid var(--tip-border);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.55);
+  font-size: 14px;
+  text-shadow: none;
+}
+
+.mc-detail-row {
+  margin: 0 0 6px;
+  display: flex;
+  gap: 12px;
+  line-height: 1.6;
+}
+
+.mc-detail-row:last-of-type {
+  margin-bottom: 0;
+}
+
+.mc-detail-row .k {
+  flex: 0 0 auto;
+  color: var(--note);
+}
+
+.mc-detail-row .v {
+  color: var(--motd);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.mc-detail-hint {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--note);
+  text-align: right;
+  opacity: 0.85;
 }
 
 /* ====== 加载骨架 ====== */
@@ -553,7 +655,8 @@ body::after {
     padding: 8px;
   }
 
-  .mc-icon {
+  .mc-icon,
+  .mc-icon-button {
     width: 44px;
     height: 44px;
   }
@@ -582,6 +685,10 @@ body::after {
 @media (prefers-reduced-motion: reduce) {
   .mc-entry {
     animation: none;
+  }
+
+  .mc-detail-wrap {
+    transition: none;
   }
 
   .mc-ping.boot {

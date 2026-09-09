@@ -3,10 +3,8 @@ import type { ServerViewModel } from "./types";
 // 通过 import 让 Vite 处理路径与 base 前缀，适配 GitHub Pages 子路径部署。
 import grassIconUrl from "../assets/textures/Grass_Block.png";
 import barrierIconUrl from "../assets/textures/Barrier.png";
-// MC 客户端 GUI 信号格图标（1.21.8 解包）
+// MC 客户端 GUI 信号格图标（1.21.8 解包）；在线默认满格，其余为占位
 import ping1Url from "../assets/mc/ping_1.png";
-import ping3Url from "../assets/mc/ping_3.png";
-import ping4Url from "../assets/mc/ping_4.png";
 import ping5Url from "../assets/mc/ping_5.png";
 import pingUnknownUrl from "../assets/mc/ping_unknown.png";
 
@@ -25,33 +23,78 @@ function escapeHtml(input: string): string {
     .replace(/'/g, "&#39;");
 }
 
-const PING_BY_LEVEL: Record<number, string> = {
-  3: ping3Url,
-  4: ping4Url,
-  5: ping5Url
-};
-
-/** 简易字符串散列，用于给每台服务器生成稳定的"信号强度"（3–5 格） */
-function pingLevelFor(id: string): number {
-  let hash = 0;
-  for (let i = 0; i < id.length; i += 1) {
-    hash = (hash * 31 + id.charCodeAt(i)) >>> 0;
-  }
-  return 3 + (hash % 3);
-}
-
-/** 信号格图标：在线 = 稳定信号；离线/故障 = 无信号图标；加载 = 呼吸 */
+/** 信号格图标：在线 = 满格；离线/故障 = 无信号图标；加载 = 呼吸 */
 function pingMarkup(view: Pick<ServerViewModel, "id" | "status">): string {
   if (view.status === "loading") {
     return `<img class="mc-ping boot" src="${ping1Url}" alt="" role="img" aria-label="正在读取" />`;
   }
 
   if (view.status === "online") {
-    return `<img class="mc-ping" src="${PING_BY_LEVEL[pingLevelFor(view.id)] ?? ping5Url}" alt="" role="img" aria-label="信号良好" />`;
+    return `<img class="mc-ping" src="${ping5Url}" alt="" role="img" aria-label="信号良好" />`;
   }
 
   const label = view.status === "error" ? "无法连接" : "无信号";
   return `<img class="mc-ping dead" src="${pingUnknownUrl}" alt="" role="img" aria-label="${label}" />`;
+}
+
+/** 复制地址并弹出反馈 */
+export async function copyAddress(value: string): Promise<void> {
+  if (!value) {
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(value);
+    toast(`已复制 ${value}`);
+  } catch {
+    toast("复制失败，请手动复制");
+  }
+}
+
+/** 图标按钮：悬停出现"加入箭头"（游戏内同款），单击复制地址 */
+function iconButtonMarkup(icon: string, address: string): string {
+  const label = address ? `复制服务器地址 ${address}` : `复制服务器地址`;
+  return `
+    <button class="mc-icon-button" type="button" data-copy-address="${escapeHtml(address)}" aria-label="${escapeHtml(label)}" title="${escapeHtml(label)}">
+      ${icon}
+      <span class="mc-icon-join" aria-hidden="true"></span>
+    </button>
+  `;
+}
+
+/** 展开区：服务器详细内容（物品提示框样式） */
+function detailMarkup(view: ServerViewModel): string {
+  const row = (key: string, value: string) =>
+    `<p class="mc-detail-row"><span class="k">${key}</span><span class="v">${value}</span></p>`;
+
+  const rows: string[] = [];
+
+  if (view.status === "online") {
+    const names = view.playerNames.map(escapeHtml).join("、");
+    const anon = view.anonymousPlayerCount > 0 ? `、匿名 ×${view.anonymousPlayerCount}` : "";
+    rows.push(row("玩家", names ? `${escapeHtml(view.playersText)}：${names}${anon}` : escapeHtml(view.playersText)));
+  }
+
+  rows.push(row("版本", escapeHtml(view.version)));
+  rows.push(row("MOTD", escapeHtml(view.motdText)));
+
+  if (view.note) {
+    rows.push(row("备注", escapeHtml(view.note)));
+  }
+
+  if (view.errorText) {
+    rows.push(row("错误", escapeHtml(view.errorText)));
+  }
+
+  return `
+    <div class="mc-detail-wrap">
+      <div class="mc-detail">
+        <div class="mc-detail-box">
+          ${rows.join("")}
+          <p class="mc-detail-hint">双击条目或点击图标可复制地址</p>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 /** 条目图标：故障用屏障，无图标用草方块，否则用服务器图标。 */
@@ -120,9 +163,10 @@ export function renderLoadingEntry(
   const entry = document.createElement("article");
   entry.className = "mc-entry loading";
   entry.dataset.serverId = id;
+  entry.dataset.primaryAddress = addresses[0] ?? "";
   entry.style.setProperty("--i", String(index));
   entry.innerHTML = `
-    <img class="mc-icon" src="${GRASS_ICON_URL}" alt="${escapeHtml(name)} 默认图标" loading="lazy" />
+    ${iconButtonMarkup(`<img class="mc-icon" src="${GRASS_ICON_URL}" alt="${escapeHtml(name)} 默认图标" loading="lazy" />`, addresses[0] ?? "")}
     <div class="mc-entry-main">
       <div class="mc-name">${escapeHtml(name)}${note ? ` <span class="mc-note">${escapeHtml(note)}</span>` : ""}</div>
       <div class="mc-motd" title="${escapeHtml(addresses.join("\n"))}"></div>
@@ -136,18 +180,21 @@ export function renderLoadingEntry(
     </div>
   `;
   parent.appendChild(entry);
-  bindAddrs(entry);
+  bindCopyButtons(entry);
 }
 
-/** 条目内容更新（保留元素本身，避免重放入场动画） */
+/** 条目内容更新（保留元素本身与展开状态，避免重放入场动画） */
 export function upsertServerEntry(parent: HTMLElement, view: ServerViewModel, _tag: string): void {
   const existing = parent.querySelector<HTMLElement>(`[data-server-id="${view.id}"]`);
   const entry = existing ?? document.createElement("article");
+  const wasExpanded = existing?.classList.contains("expanded") ?? false;
 
-  entry.className = `mc-entry ${view.status}`;
+  entry.className = `mc-entry ${view.status}${wasExpanded ? " expanded" : ""}`;
   entry.dataset.serverId = view.id;
+  entry.dataset.primaryAddress = view.address;
+  entry.setAttribute("aria-expanded", String(wasExpanded));
   entry.innerHTML = `
-    ${entryIconMarkup(view)}
+    ${iconButtonMarkup(entryIconMarkup(view), view.address)}
     <div class="mc-entry-main">
       <div class="mc-name">${escapeHtml(view.name)}${view.note ? ` <span class="mc-note">${escapeHtml(view.note)}</span>` : ""}</div>
       <div class="mc-motd" title="${escapeHtml(view.motdText)}">${view.motdHtml ?? escapeHtml(view.motdText)}</div>
@@ -156,6 +203,7 @@ export function upsertServerEntry(parent: HTMLElement, view: ServerViewModel, _t
       <div class="mc-entry-foot">
         ${addrMarkup(view)}
       </div>
+      ${detailMarkup(view)}
     </div>
     <div class="mc-entry-side">
       <span class="mc-count${view.status === "online" ? "" : " dead"}">${escapeHtml(view.playersText)} ${pingMarkup(view)}</span>
@@ -167,23 +215,16 @@ export function upsertServerEntry(parent: HTMLElement, view: ServerViewModel, _t
     parent.appendChild(entry);
   }
 
-  bindAddrs(entry);
+  bindCopyButtons(entry);
 }
 
-function bindAddrs(entry: HTMLElement): void {
-  const buttons = entry.querySelectorAll<HTMLButtonElement>(".mc-addr");
+/** 绑定所有复制按钮（地址 chip 与图标按钮），阻止冒泡以免触发展开 */
+function bindCopyButtons(entry: HTMLElement): void {
+  const buttons = entry.querySelectorAll<HTMLButtonElement>(".mc-addr, .mc-icon-button");
   for (const button of buttons) {
-    button.onclick = async () => {
-      const value = button.dataset.copyAddress ?? "";
-      if (!value) {
-        return;
-      }
-      try {
-        await navigator.clipboard.writeText(value);
-        toast(`已复制 ${value}`);
-      } catch {
-        toast("复制失败，请手动复制");
-      }
+    button.onclick = (event) => {
+      event.stopPropagation();
+      void copyAddress(button.dataset.copyAddress ?? "");
     };
   }
 }
