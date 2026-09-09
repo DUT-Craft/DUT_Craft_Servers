@@ -19,7 +19,7 @@ npm run preview   # 预览 dist/
 
 - `src/main.ts` — 入口；全部/单卡刷新逻辑；卡片排序（在线有玩家 > 在线无玩家 > 其他，同优先级按配置顺序，序号 01… 按配置顺序固定）；配置提示（`#config-banner`）；页头汇总统计、时钟、60 秒自动同步（页面隐藏时跳过）。
 - `src/config.ts` — 解析 servers.json（`address` 支持字符串简写 `"host:port"`、字符串/对象混合数组；兼容旧版 `host`/`port` 平铺格式；`note` 字段会显示在卡片上）；加载失败时返回内置 `DEFAULT_SERVER_LIST` 并附带 `problemText` 供横幅展示，不再静默吞错。
-- `src/api.ts` — API 请求（8s 超时）、MOTD/图标/玩家数据规范化。只有每个服务器的第一个地址（primary）会被查询，其余地址仅展示和复制。
+- `src/api.ts` — API 请求（8s 超时）：**所有地址并行查询，取第一个在线的作为展示数据**（第一个入口不可达自动落到下一个）；确认离线的地址记入 `unreachableAddresses`，界面 chips 标红。全部离线显示离线，全部出错显示故障。
 - `src/ui.ts` — 服务器条目（`.mc-entry`）渲染、真实 ping 图标、地址点击复制、toast。
 - `src/theme.ts` — 夜晚/白天切换（`data-theme` 属性 + localStorage key `dutcraft-theme`，与 index.html 的防 FOUC 内联脚本共用）。
 - `src/types.ts` — 共享类型。

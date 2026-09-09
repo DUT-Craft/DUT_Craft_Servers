@@ -1,5 +1,5 @@
-import type { ApiServerResponse, ServerTarget, ServerViewModel } from "./types";
-import { getPrimaryAddress, getServerId, toAddressList } from "./config";
+import type { ApiServerResponse, ServerAddressTarget, ServerTarget, ServerViewModel } from "./types";
+import { getServerId, toAddress, toAddressList } from "./config";
 
 const API_BASE = "https://api.mcsrvstat.us/2";
 const REQUEST_TIMEOUT_MS = 8000;
@@ -135,10 +135,11 @@ function normalizePlayerNames(rawList?: string[]): string[] {
     .filter((name) => name.length > 0);
 }
 
-export async function fetchServerView(server: ServerTarget): Promise<ServerViewModel> {
+/** 查询单个地址目标的完整视图（online/offline/error 三态） */
+async function queryServerTarget(server: ServerTarget, target: ServerAddressTarget): Promise<ServerViewModel> {
   const id = getServerId(server);
   const addresses = toAddressList(server);
-  const address = getPrimaryAddress(server);
+  const address = toAddress(target);
   const { signal, clearTimer } = withTimeout(REQUEST_TIMEOUT_MS);
 
   try {
@@ -213,4 +214,24 @@ export async function fetchServerView(server: ServerTarget): Promise<ServerViewM
   } finally {
     clearTimer();
   }
+}
+
+/**
+ * 查询服务器：所有地址并行查询，取第一个在线的作为展示数据；
+ * 其余地址若确认离线则记入 unreachableAddresses（界面标红）。
+ * 全部离线时显示离线；全部查询出错时显示故障。
+ */
+export async function fetchServerView(server: ServerTarget): Promise<ServerViewModel> {
+  const results = await Promise.all(server.address.map((target) => queryServerTarget(server, target)));
+
+  const chosen =
+    results.find((result) => result.status === "online") ??
+    results.find((result) => result.status === "offline") ??
+    results[0];
+
+  chosen.unreachableAddresses = results
+    .filter((result) => result.status === "offline")
+    .map((result) => result.address);
+
+  return chosen;
 }

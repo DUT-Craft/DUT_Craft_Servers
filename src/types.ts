@@ -36,6 +36,8 @@ export interface ServerViewModel {
   note?: string;
   address: string;
   addresses: string[];
+  /** 查询确认不可达的地址（显示为红色） */
+  unreachableAddresses?: string[];
   iconDataUrl?: string;
   status: ServerUiStatus;
   version: string;

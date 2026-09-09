@@ -237,6 +237,15 @@ board.addEventListener("click", (event) => {
 
   const timer = window.setTimeout(() => {
     pendingExpand = null;
+    // 手风琴：展开新条目前先收起其他条目
+    if (!entry.classList.contains("expanded")) {
+      for (const other of Array.from(board.querySelectorAll<HTMLElement>(".mc-entry.expanded"))) {
+        if (other !== entry) {
+          other.classList.remove("expanded");
+          other.setAttribute("aria-expanded", "false");
+        }
+      }
+    }
     toggleExpand(entry);
   }, CLICK_DELAY_MS);
   pendingExpand = { entry, timer };

@@ -129,12 +129,12 @@ function crewMarkup(view: ServerViewModel): string {
   return `<p class="mc-crew" title="${fullTitle}">${visible}${more}${anon}</p>`;
 }
 
-function addrMarkup(view: Pick<ServerViewModel, "addresses">): string {
+function addrMarkup(view: Pick<ServerViewModel, "addresses" | "unreachableAddresses">): string {
   return view.addresses
-    .map(
-      (item) =>
-        `<button class="mc-addr" type="button" data-copy-address="${escapeHtml(item)}" aria-label="复制服务器地址 ${escapeHtml(item)}">${escapeHtml(item)}</button>`
-    )
+    .map((item) => {
+      const dead = view.unreachableAddresses?.includes(item) ? " dead" : "";
+      return `<button class="mc-addr${dead}" type="button" data-copy-address="${escapeHtml(item)}" aria-label="复制服务器地址 ${escapeHtml(item)}">${escapeHtml(item)}</button>`;
+    })
     .join("");
 }
 

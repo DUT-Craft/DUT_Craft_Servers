@@ -127,7 +127,7 @@ body {
 /* 夜晚：换用 night.png，略压暗（蒙版之外再收一点） */
 [data-theme="dark"] .backdrop {
   background-image: url("../assets/backgrounds/night.png");
-  filter: brightness(0.8) saturate(0.92);
+  /* filter: brightness(0.8) saturate(0.92); */
 }
 
 /* 黑色蒙版 + 暗角：位于背景与前景之间，保证白字可读。
@@ -380,6 +380,16 @@ body::after {
   color: #ffff9c;
 }
 
+/* 查询确认不可达的地址：红色标注（仍可点击复制） */
+.mc-addr.dead {
+  color: var(--red-text);
+}
+
+.mc-addr.dead:hover,
+.mc-addr.dead:focus-visible {
+  color: #ff8a76;
+}
+
 /* 右侧信息列 */
 .mc-entry-side {
   display: flex;
@@ -486,15 +496,14 @@ body::after {
   opacity: 0.85;
 }
 
-/* ====== 加载骨架 ====== */
-.mc-entry.loading .mc-name,
-.mc-entry.loading .mc-motd {
-  color: transparent;
-  user-select: none;
+/* ====== 加载骨架：名称以灰色可见（区分于加载完成），MOTD 为流光条 ====== */
+.mc-entry.loading .mc-name {
+  color: var(--note);
 }
 
-.mc-entry.loading .mc-name {
-  position: relative;
+.mc-entry.loading .mc-motd {
+  color: transparent;
+  text-shadow: none;
 }
 
 /* ============================================================
