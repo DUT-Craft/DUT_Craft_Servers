@@ -8,6 +8,13 @@
     "address": "building.unsafe.top"
   },
   {
+    "name": "DUT_Craft 小游戏服",
+    "address": [
+      "hz.utf-8.fun:25569",
+      "mchk.unsafe.top:25569"
+    ]
+  },
+  {
     "name": "DUT_Craft 速通服",
     "address": "speedrun.unsafe.top"
   },
@@ -23,6 +30,13 @@
     ]
   },
   {
+    "name": "方可梦 Cobbleverse 服务器",
+    "address": [
+      "hz.utf-8.fun:25566",
+      "mchk.unsafe.top:25566"
+    ]
+  },
+  {
     "name": "DUT_Craft 工地服",
     "address": "earth.unsafe.top"
   },
@@ -33,13 +47,6 @@
   {
     "name": "DUT_Craft 长期服",
     "address": "lts.unsafe.top"
-  },
-  {
-    "name": "DUT_Craft 小游戏服",
-    "address": [
-      "hz.utf-8.fun:25569",
-      "mchk.unsafe.top:25569"
-    ]
   },
   {
     "name": "示例离线服",

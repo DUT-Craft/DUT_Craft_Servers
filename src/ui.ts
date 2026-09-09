@@ -3,8 +3,7 @@ import type { ServerViewModel } from "./types";
 // 通过 import 让 Vite 处理路径与 base 前缀，适配 GitHub Pages 子路径部署。
 import grassIconUrl from "../assets/textures/Grass_Block.png";
 import barrierIconUrl from "../assets/textures/Barrier.png";
-// MC 客户端 GUI 信号格图标（1.21.8 解包）；在线默认满格，其余为占位
-import ping1Url from "../assets/mc/ping_1.png";
+// MC 客户端 GUI 信号格图标（1.21.8 解包）；在线默认满格
 import ping5Url from "../assets/mc/ping_5.png";
 import pingUnknownUrl from "../assets/mc/ping_unknown.png";
 
@@ -23,10 +22,10 @@ function escapeHtml(input: string): string {
     .replace(/'/g, "&#39;");
 }
 
-/** 信号格图标：在线 = 满格；离线/故障 = 无信号图标；加载 = 呼吸 */
+/** 信号格图标：在线 = 满格；离线/故障 = 无信号图标；加载 = 蓝色信号条逐格点亮（游戏内同款） */
 function pingMarkup(view: Pick<ServerViewModel, "id" | "status">): string {
   if (view.status === "loading") {
-    return `<img class="mc-ping boot" src="${ping1Url}" alt="" role="img" aria-label="正在读取" />`;
+    return `<span class="mc-ping-bars boot" role="img" aria-label="正在连接"><i></i><i></i><i></i><i></i><i></i></span>`;
   }
 
   if (view.status === "online") {
