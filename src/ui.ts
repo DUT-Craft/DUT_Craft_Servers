@@ -5,7 +5,10 @@ import grassIconUrl from "../assets/textures/Grass_Block.png";
 import barrierIconUrl from "../assets/textures/Barrier.png";
 // MC 客户端 GUI 信号格图标（1.21.8 解包）；在线默认满格
 import ping5Url from "../assets/mc/ping_5.png";
-import pingUnknownUrl from "../assets/mc/ping_unknown.png";
+import unreachableUrl from "../assets/mc/unreachable.png";
+// 加入箭头（游戏内悬停服务器图标时显示的原版素材）
+import joinUrl from "../assets/mc/join.png";
+import joinHighlightedUrl from "../assets/mc/join_highlighted.png";
 
 const GRASS_ICON_URL = grassIconUrl;
 const BARRIER_ICON_URL = barrierIconUrl;
@@ -22,10 +25,10 @@ function escapeHtml(input: string): string {
     .replace(/'/g, "&#39;");
 }
 
-/** 信号格图标：在线 = 满格；离线/故障 = 无信号图标；加载 = 蓝色信号条逐格点亮（游戏内同款） */
+/** 信号格图标：在线 = 满格；离线/故障 = 不可达图标；加载 = 原版 pinging 帧动画（CSS 驱动） */
 function pingMarkup(view: Pick<ServerViewModel, "id" | "status">): string {
   if (view.status === "loading") {
-    return `<span class="mc-ping-bars boot" role="img" aria-label="正在连接"><i></i><i></i><i></i><i></i><i></i></span>`;
+    return `<span class="mc-ping-frame boot" role="img" aria-label="正在连接"></span>`;
   }
 
   if (view.status === "online") {
@@ -33,7 +36,7 @@ function pingMarkup(view: Pick<ServerViewModel, "id" | "status">): string {
   }
 
   const label = view.status === "error" ? "无法连接" : "无信号";
-  return `<img class="mc-ping dead" src="${pingUnknownUrl}" alt="" role="img" aria-label="${label}" />`;
+  return `<img class="mc-ping dead" src="${unreachableUrl}" alt="" role="img" aria-label="${label}" />`;
 }
 
 /** 复制地址并弹出反馈 */
@@ -49,13 +52,16 @@ export async function copyAddress(value: string): Promise<void> {
   }
 }
 
-/** 图标按钮：悬停出现"加入箭头"（游戏内同款），单击复制地址 */
+/** 图标按钮：悬停出现原版"加入箭头"（普通/高亮双态），单击复制地址 */
 function iconButtonMarkup(icon: string, address: string): string {
   const label = address ? `复制服务器地址 ${address}` : `复制服务器地址`;
   return `
     <button class="mc-icon-button" type="button" data-copy-address="${escapeHtml(address)}" aria-label="${escapeHtml(label)}" title="${escapeHtml(label)}">
       ${icon}
-      <span class="mc-icon-join" aria-hidden="true"></span>
+      <span class="mc-icon-join" aria-hidden="true">
+        <img class="join" src="${joinUrl}" alt="" />
+        <img class="join-hi" src="${joinHighlightedUrl}" alt="" />
+      </span>
     </button>
   `;
 }

@@ -226,7 +226,7 @@ body::after {
 .mc-entry {
   position: relative;
   display: grid;
-  grid-template-columns: 56px 1fr auto;
+  grid-template-columns: 64px 1fr auto;
   gap: 14px;
   padding: 10px 12px;
   border: 2px solid transparent;
@@ -257,10 +257,10 @@ body::after {
   border-color: rgba(255, 255, 255, 0.85);
 }
 
-/* 图标：游戏内为黑框贴图 */
+/* 图标：游戏内为黑框贴图（64px = 32×32 素材 2 倍整数缩放） */
 .mc-icon {
-  width: 56px;
-  height: 56px;
+  width: 64px;
+  height: 64px;
   image-rendering: pixelated;
   object-fit: contain;
   border: 1px solid #000000;
@@ -268,11 +268,11 @@ body::after {
   background: #1c1917;
 }
 
-/* 图标按钮：悬停出现"加入箭头"（游戏内同款），单击复制地址 */
+/* 图标按钮：悬停显示原版"加入箭头"（32×32 素材，普通/高亮双态），单击复制地址 */
 .mc-icon-button {
   position: relative;
-  width: 56px;
-  height: 56px;
+  width: 64px;
+  height: 64px;
   padding: 0;
   border: none;
   background: transparent;
@@ -288,25 +288,33 @@ body::after {
   position: absolute;
   inset: 0;
   display: none;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.62);
+}
+
+.mc-icon-join img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  object-fit: contain;
+}
+
+.mc-icon-join .join-hi {
+  display: none;
 }
 
 .mc-icon-button:hover .mc-icon-join,
 .mc-icon-button:focus-visible .mc-icon-join {
-  display: flex;
+  display: block;
 }
 
-/* CSS 三角箭头（像素风清晰，不依赖字体的 ▶） */
-.mc-icon-join::before {
-  content: "";
-  width: 0;
-  height: 0;
-  border-top: 10px solid transparent;
-  border-bottom: 10px solid transparent;
-  border-left: 15px solid #dcdcdc;
-  margin-left: 4px;
+.mc-icon-button:hover .join,
+.mc-icon-button:focus-visible .join {
+  display: none;
+}
+
+.mc-icon-button:hover .join-hi,
+.mc-icon-button:focus-visible .join-hi {
+  display: block;
 }
 
 /* 主信息列 */
@@ -430,67 +438,30 @@ body::after {
   flex: 0 0 auto;
 }
 
-/* 连接中：蓝色信号条往返扫描 1→5→1（游戏内 ping 动画，色号取自截图） */
-.mc-ping-bars {
-  display: inline-flex;
-  align-items: flex-end;
-  gap: 2px;
+/* 连接中：原版 pinging 帧动画（10×8 素材），150ms/帧乒乓循环 1→5→1 */
+.mc-ping-frame {
   width: 22px;
   height: 18px;
   flex: 0 0 auto;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-image: url("../assets/mc/pinging_1.png");
+  image-rendering: pixelated;
 }
 
-.mc-ping-bars i {
-  width: 3px;
-  background: #3f3f3f;
-  box-shadow: 1px 0 0 rgba(0, 0, 0, 0.4);
+.mc-ping-frame.boot {
+  animation: pinging-cycle 1.2s steps(1) infinite;
 }
 
-.mc-ping-bars i:nth-child(1) { height: 4px; }
-.mc-ping-bars i:nth-child(2) { height: 7px; }
-.mc-ping-bars i:nth-child(3) { height: 10px; }
-.mc-ping-bars i:nth-child(4) { height: 13px; }
-.mc-ping-bars i:nth-child(5) { height: 16px; }
-
-/* 全周期 1.6s = 8 步 × 200ms；点亮次序 1,2,3,4,5,4,3,2 */
-.mc-ping-bars.boot i:nth-child(1) { animation: ping-sweep-1 1.6s infinite; }
-.mc-ping-bars.boot i:nth-child(2) { animation: ping-sweep-2 1.6s infinite; }
-.mc-ping-bars.boot i:nth-child(3) { animation: ping-sweep-3 1.6s infinite; }
-.mc-ping-bars.boot i:nth-child(4) { animation: ping-sweep-4 1.6s infinite; }
-.mc-ping-bars.boot i:nth-child(5) { animation: ping-sweep-5 1.6s infinite; }
-
-@keyframes ping-sweep-1 {
-  0%, 12.49% { background: #25a3e5; box-shadow: 1px 0 0 #1f3b45, 0 1px 0 #1f3b45; }
-  12.5%, 100% { background: #3f3f3f; box-shadow: 1px 0 0 rgba(0, 0, 0, 0.4); }
-}
-
-@keyframes ping-sweep-2 {
-  0%, 12.49% { background: #3f3f3f; box-shadow: 1px 0 0 rgba(0, 0, 0, 0.4); }
-  12.5%, 24.99% { background: #25a3e5; box-shadow: 1px 0 0 #1f3b45, 0 1px 0 #1f3b45; }
-  25%, 87.49% { background: #3f3f3f; box-shadow: 1px 0 0 rgba(0, 0, 0, 0.4); }
-  87.5%, 100% { background: #25a3e5; box-shadow: 1px 0 0 #1f3b45, 0 1px 0 #1f3b45; }
-}
-
-@keyframes ping-sweep-3 {
-  0%, 24.99% { background: #3f3f3f; box-shadow: 1px 0 0 rgba(0, 0, 0, 0.4); }
-  25%, 37.49% { background: #25a3e5; box-shadow: 1px 0 0 #1f3b45, 0 1px 0 #1f3b45; }
-  37.5%, 74.99% { background: #3f3f3f; box-shadow: 1px 0 0 rgba(0, 0, 0, 0.4); }
-  75%, 87.49% { background: #25a3e5; box-shadow: 1px 0 0 #1f3b45, 0 1px 0 #1f3b45; }
-  87.5%, 100% { background: #3f3f3f; box-shadow: 1px 0 0 rgba(0, 0, 0, 0.4); }
-}
-
-@keyframes ping-sweep-4 {
-  0%, 37.49% { background: #3f3f3f; box-shadow: 1px 0 0 rgba(0, 0, 0, 0.4); }
-  37.5%, 49.99% { background: #25a3e5; box-shadow: 1px 0 0 #1f3b45, 0 1px 0 #1f3b45; }
-  50%, 62.49% { background: #3f3f3f; box-shadow: 1px 0 0 rgba(0, 0, 0, 0.4); }
-  62.5%, 74.99% { background: #25a3e5; box-shadow: 1px 0 0 #1f3b45, 0 1px 0 #1f3b45; }
-  75%, 100% { background: #3f3f3f; box-shadow: 1px 0 0 rgba(0, 0, 0, 0.4); }
-}
-
-@keyframes ping-sweep-5 {
-  0%, 49.99% { background: #3f3f3f; box-shadow: 1px 0 0 rgba(0, 0, 0, 0.4); }
-  50%, 62.49% { background: #25a3e5; box-shadow: 1px 0 0 #1f3b45, 0 1px 0 #1f3b45; }
-  62.5%, 100% { background: #3f3f3f; box-shadow: 1px 0 0 rgba(0, 0, 0, 0.4); }
+@keyframes pinging-cycle {
+  0%, 12.5% { background-image: url("../assets/mc/pinging_1.png"); }
+  12.5%, 25% { background-image: url("../assets/mc/pinging_2.png"); }
+  25%, 37.5% { background-image: url("../assets/mc/pinging_3.png"); }
+  37.5%, 50% { background-image: url("../assets/mc/pinging_4.png"); }
+  50%, 62.5% { background-image: url("../assets/mc/pinging_5.png"); }
+  62.5%, 75% { background-image: url("../assets/mc/pinging_4.png"); }
+  75%, 87.5% { background-image: url("../assets/mc/pinging_3.png"); }
+  87.5%, 100% { background-image: url("../assets/mc/pinging_2.png"); }
 }
 
 /* ====== 详情展开区（物品提示框样式，单击条目展开）====== */
@@ -753,11 +724,10 @@ body::after {
     transition: none;
   }
 
-  .mc-ping-bars.boot i {
+  .mc-ping-frame.boot {
     animation: none;
-    background: #25a3e5;
-    box-shadow: 1px 0 0 #1f3b45, 0 1px 0 #1f3b45;
-    opacity: 0.65;
+    background-image: url("../assets/mc/pinging_5.png");
+    opacity: 0.75;
   }
 
   .toast,
