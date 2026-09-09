@@ -31,8 +31,15 @@
     "address": "mod.unsafe.top"
   },
   {
-    "name": "DUT_Craft 小游戏服",
+    "name": "DUT_Craft 长期服",
     "address": "lts.unsafe.top"
+  },
+  {
+    "name": "DUT_Craft 小游戏服",
+    "address": [
+      "hz.utf-8.fun:25569",
+      "mchk.unsafe.top:25569"
+    ]
   },
   {
     "name": "示例离线服",
