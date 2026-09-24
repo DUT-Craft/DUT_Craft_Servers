@@ -19,7 +19,7 @@
     "address": "speedrun.unsafe.top"
   },
   {
-    "name": "DUT_Craft 生存服",
+    "name": "DUT_Craft 生电服",
     "address": "survival.unsafe.top"
   },
   {
@@ -30,10 +30,10 @@
     ]
   },
   {
-    "name": "方可梦 Cobbleverse 服务器",
+    "name": "DUT_Craft 养老生存服",
     "address": [
-      "hz.utf-8.fun:25566",
-      "mchk.unsafe.top:25566"
+      "hz.utf-8.fun:25567",
+      "mchk.unsafe.top:25567"
     ]
   },
   {
